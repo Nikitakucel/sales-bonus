@@ -64,7 +64,7 @@ function analyzeSalesData(data, options) {
         products_sold: {}
     }));
 
-    // Индексация
+    // Индексация для быстрого доступа
     const sellerIndex = Object.fromEntries(
         sellerStats.map(seller => [seller.id, seller])
     );
@@ -97,22 +97,20 @@ function analyzeSalesData(data, options) {
         });
     });
 
-    // Сортировка
+    // Сортировка по прибыли
     const sortedSellers = [...sellerStats].sort((a, b) => b.profit - a.profit);
 
-    // Назначение бонусов
+    // Назначение бонусов и формирование топ-10
     sortedSellers.forEach((seller, index) => {
         seller.bonus = calculateBonus(index, sortedSellers.length, seller);
         
-        const productsArray = Object.entries(seller.products_sold)
+        seller.top_products = Object.entries(seller.products_sold)
             .map(([sku, quantity]) => ({ sku, quantity }))
             .sort((a, b) => b.quantity - a.quantity)
             .slice(0, 10);
-        
-        seller.top_products = productsArray;
     });
 
-    // Подготовка итоговой коллекции
+    // Возврат результата
     return sortedSellers.map(seller => ({
         seller_id: seller.id,
         name: seller.name,
