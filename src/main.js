@@ -72,6 +72,7 @@ function analyzeSalesData(data, options) {
         sellerIndex[stat.id] = stat;
     });
 
+
     const productIndex = {};
     data.products.forEach(product => {
         productIndex[product.sku] = product;
