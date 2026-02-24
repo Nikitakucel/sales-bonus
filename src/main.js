@@ -113,10 +113,10 @@ function analyzeSalesData(data, options) {
     return sortedSellers.map(seller => ({
         seller_id: seller.id,
         name: seller.name,
-        revenue: Math.round(seller.revenue * 100) / 100,
-        profit: Math.round(seller.profit * 100) / 100,
+        revenue: +seller.revenue.toFixed(2),
+        profit: +seller.profit.toFixed(2),
         sales_count: seller.sales_count,
         top_products: seller.top_products,
-        bonus: Math.round(seller.bonus * 100) / 100
-    }));
+        bonus: +seller.bonus.toFixed(2)
+}));
 }
