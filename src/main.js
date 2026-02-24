@@ -6,6 +6,9 @@
  */
 function calculateSimpleRevenue(purchase, _product) {
    // @TODO: Расчет выручки от операции
+    const { discount, sale_price, quantity } = purchase;
+    const discountMultiplier = 1 - (discount / 100);
+    return sale_price * quantity * discountMultiplier;
 }
 
 /**
@@ -17,6 +20,16 @@ function calculateSimpleRevenue(purchase, _product) {
  */
 function calculateBonusByProfit(index, total, seller) {
     // @TODO: Расчет бонуса от позиции в рейтинге
+    const { profit } = seller;
+    if (index === 0) {
+        return profit * 0.15;
+    } else if (index === 1 || index === 2) {
+        return profit * 0.10;
+    } else if (index === total - 1) {
+        return 0;
+    } else {
+        return profit * 0.05;
+    }
 }
 
 /**
@@ -28,17 +41,25 @@ function calculateBonusByProfit(index, total, seller) {
 function analyzeSalesData(data, options) {
     // @TODO: Проверка входных данных
 
+
     // @TODO: Проверка наличия опций
+
 
     // @TODO: Подготовка промежуточных данных для сбора статистики
 
+
     // @TODO: Индексация продавцов и товаров для быстрого доступа
+
 
     // @TODO: Расчет выручки и прибыли для каждого продавца
 
+
     // @TODO: Сортировка продавцов по прибыли
+
 
     // @TODO: Назначение премий на основе ранжирования
 
+
     // @TODO: Подготовка итоговой коллекции с нужными полями
+    
 }
