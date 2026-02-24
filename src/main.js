@@ -83,16 +83,19 @@ function analyzeSalesData(data, options) {
         if (!seller) return;
         
         seller.sales_count += 1;
+        
+        // ===== ВАЖНО! Считаем revenue из чека =====
+        seller.revenue += record.total_amount;  // total_amount уже со скидкой!
 
         if (Array.isArray(record.items)) {
             record.items.forEach(item => {
                 const product = productIndex[item.sku];
                 if (!product) return;
                 
+                // Для прибыли используем calculateRevenue
                 const revenue = calculateRevenue(item, product);
                 const cost = product.purchase_price * item.quantity;
                 
-                seller.revenue += revenue;      // ТОЛЬКО ЗДЕСЬ
                 seller.profit += (revenue - cost);
 
                 const sku = item.sku;
