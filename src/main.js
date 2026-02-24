@@ -72,26 +72,28 @@ function analyzeSalesData(data, options) {
         sellerIndex[stat.id] = stat;
     });
 
-
     const productIndex = {};
     data.products.forEach(product => {
         productIndex[product.sku] = product;
     });
 
+    // Расчет выручки и прибыли
     data.purchase_records.forEach(record => {
         const seller = sellerIndex[record.seller_id];
         if (!seller) return;
+        
         seller.sales_count += 1;
-        seller.revenue += record.total_amount;
 
         if (Array.isArray(record.items)) {
             record.items.forEach(item => {
-                const revenueItem = calculateRevenue(item, productIndex[item.sku]);
-
                 const product = productIndex[item.sku];
-                const cost = product ? product.purchase_price * item.quantity : 0;
-
-                seller.profit += (revenueItem - cost);
+                if (!product) return;
+                
+                const revenue = calculateRevenue(item, product);
+                const cost = product.purchase_price * item.quantity;
+                
+                seller.revenue += revenue;      // ТОЛЬКО ЗДЕСЬ
+                seller.profit += (revenue - cost);
 
                 const sku = item.sku;
                 if (!seller.products_sold[sku]) {
@@ -102,24 +104,29 @@ function analyzeSalesData(data, options) {
         }
     });
 
+    // Сортировка
     sellerStats.sort((a, b) => b.profit - a.profit);
 
+    // Назначение бонусов и топ-10
     const totalSellers = sellerStats.length;
     sellerStats.forEach((seller, index) => {
-        // Расчёт бонуса
         seller.bonus = calculateBonus(index, totalSellers, seller);
 
-        const productList = Object.entries(seller.products_sold).map(([sku, quantity]) => ({ sku, quantity }));
-        productList.sort((a, b) => {
-            if (a.quantity !== b.quantity) {
-                return b.quantity - a.quantity;
-            } else {
-                return a.sku.localeCompare(b.sku);
-            }
-        });
-        seller.top_products = productList.slice(0, 10);
+        const productList = Object.entries(seller.products_sold)
+            .map(([sku, quantity]) => ({ sku, quantity }))
+            .sort((a, b) => {
+                if (a.quantity !== b.quantity) {
+                    return b.quantity - a.quantity;
+                } else {
+                    return a.sku.localeCompare(b.sku);
+                }
+            })
+            .slice(0, 10);
+        
+        seller.top_products = productList;
     });
 
+    // Возврат результата
     return sellerStats.map(seller => ({
         seller_id: seller.id,
         name: seller.name,
@@ -129,4 +136,11 @@ function analyzeSalesData(data, options) {
         top_products: seller.top_products,
         bonus: +seller.bonus.toFixed(2)
     }));
+}
+
+// Код для браузера
+if (typeof window !== 'undefined') {
+    window.calculateSimpleRevenue = calculateSimpleRevenue;
+    window.calculateBonusByProfit = calculateBonusByProfit;
+    window.analyzeSalesData = analyzeSalesData;
 }
