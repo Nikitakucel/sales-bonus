@@ -109,17 +109,15 @@ function analyzeSalesData(data, options) {
         seller.top_products = productsArray;
     });
 
-    // @TODO: Подготовка итоговой коллекции с нужными полями
-    // ИСПРАВЛЕНО: добавил недостающую закрывающую скобку
 // @TODO: Подготовка итоговой коллекции с нужными полями
 return sortedSellers.map(seller => ({
     seller_id: seller.id,
     name: seller.name,
-    revenue: seller.revenue.toFixed(2),
-    profit: seller.profit.toFixed(2),
+    revenue: parseFloat(seller.revenue.toFixed(2)),
+    profit: parseFloat(seller.profit.toFixed(2)),
     sales_count: seller.sales_count,
     top_products: seller.top_products,
-    bonus: seller.bonus.toFixed(2)
+    bonus: parseFloat(seller.bonus.toFixed(2))
 }));
 }
 
