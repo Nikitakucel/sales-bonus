@@ -115,20 +115,27 @@ const totalSellers = sellerStats.length;
 sellerStats.forEach((seller, index) => {
     seller.bonus = calculateBonus(index, totalSellers, seller);
 
-    const productList = Object.entries(seller.products_sold)
-        .map(([sku, quantity]) => ({ sku, quantity }))
-        .sort((a, b) => {
-            if (a.quantity !== b.quantity) {
-                return b.quantity - a.quantity;
-            }
-            // ИСПРАВЛЕНО: строгая сортировка по SKU
-            if (a.sku < b.sku) return -1;
-            if (a.sku > b.sku) return 1;
-            return 0;
-        })
-        .slice(0, 10);
+    // Преобразуем объект в массив и сортируем
+    const productsArray = [];
+    for (const sku in seller.products_sold) {
+        productsArray.push({
+            sku: sku,
+            quantity: seller.products_sold[sku]
+        });
+    }
     
-    seller.top_products = productList;
+    // Сортировка: сначала по количеству (убывание), потом по SKU (возрастание)
+    productsArray.sort((a, b) => {
+        if (a.quantity !== b.quantity) {
+            return b.quantity - a.quantity;
+        }
+        // При одинаковом количестве - сортируем по SKU (алфавитно)
+        if (a.sku < b.sku) return -1;
+        if (a.sku > b.sku) return 1;
+        return 0;
+    });
+    
+    seller.top_products = productsArray.slice(0, 10);
 });
 
     // Возврат результата
