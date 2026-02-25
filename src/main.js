@@ -110,24 +110,26 @@ function analyzeSalesData(data, options) {
     // Сортировка
     sellerStats.sort((a, b) => b.profit - a.profit);
 
-    // Назначение бонусов и топ-10
-    const totalSellers = sellerStats.length;
-    sellerStats.forEach((seller, index) => {
-        seller.bonus = calculateBonus(index, totalSellers, seller);
+// Назначение бонусов и топ-10
+const totalSellers = sellerStats.length;
+sellerStats.forEach((seller, index) => {
+    seller.bonus = calculateBonus(index, totalSellers, seller);
 
-        const productList = Object.entries(seller.products_sold)
-            .map(([sku, quantity]) => ({ sku, quantity }))
-            .sort((a, b) => {
-                if (a.quantity !== b.quantity) {
-                    return b.quantity - a.quantity;
-                } else {
-                    return a.sku.localeCompare(b.sku);
-                }
-            })
-            .slice(0, 10);
-        
-        seller.top_products = productList;
-    });
+    const productList = Object.entries(seller.products_sold)
+        .map(([sku, quantity]) => ({ sku, quantity }))
+        .sort((a, b) => {
+            if (a.quantity !== b.quantity) {
+                return b.quantity - a.quantity;
+            }
+            // ИСПРАВЛЕНО: строгая сортировка по SKU
+            if (a.sku < b.sku) return -1;
+            if (a.sku > b.sku) return 1;
+            return 0;
+        })
+        .slice(0, 10);
+    
+    seller.top_products = productList;
+});
 
     // Возврат результата
     return sellerStats.map(seller => ({
